@@ -1,26 +1,18 @@
-import React, {type PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React from 'react';
+import {StyleSheet} from 'react-native';
 
 import {NavigationContainer} from '@react-navigation/native';
 
 import {Provider} from 'react-redux';
 import {store} from './src/redux/store/store';
 
-import {MainScreen} from './src/screens/main';
+import {MainContainer} from './src/screens/index';
 
 const App = () => {
   return (
     <NavigationContainer>
       <Provider store={store}>
-        <MainScreen />
+        <MainContainer />
       </Provider>
     </NavigationContainer>
   );
