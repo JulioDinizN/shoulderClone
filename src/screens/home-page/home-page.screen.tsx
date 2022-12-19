@@ -2,98 +2,101 @@ import {useEffect, useState} from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
-  ScrollView,
   SafeAreaView,
   FlatList,
-  StyleSheet,
   Image,
   Dimensions,
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks/hooks';
-import {getProducts} from '../../api/services';
 import {formatCurrency} from '../../utils/index';
-
-type RequestResponse = {
-  data: Product[];
-  message: string;
-  metadata: {
-    currentPage: number;
-    nextPage: number;
-    totalPages: number;
-    totalProducts: number;
-  };
-  status: number;
-};
-
-type Product = {
-  _id: string;
-  category: {
-    _id: string;
-    name: string;
-    slug: string;
-  };
-  createdAt: Date;
-  createdBy: {
-    _id: string;
-    name: string;
-    role: string;
-  };
-  description: string;
-  image: string;
-  price: number;
-  slug: string;
-  title: string;
-  updatedAt: Date;
-};
+import {Product} from '../../types';
+import {
+  fetchProductsByPage,
+  setFirstLoad,
+} from '../../redux/reducers/product/productReducer';
 
 export function HomeScreen() {
-  const count = useAppSelector(state => state.products.products);
+  const [page, setPage] = useState(1);
+  const {products, loading, isPaginationEnd, isFirstLoad} = useAppSelector(
+    state => state.products,
+  );
   const dispatch = useAppDispatch();
-  const [products, setProducts] = useState<Product[]>([]);
 
   const productsLength = products.length;
 
   useEffect(() => {
-    getProducts(1).then(data => {
-      console.log(data.data);
-      setProducts(data.data.data);
-    });
-  }, []);
+    if (page == 1) {
+      dispatch(setFirstLoad(true));
+    }
+    dispatch(fetchProductsByPage(page));
+  }, [page]);
+
+  const fetchMoreData = () => {
+    if (!isPaginationEnd && !loading) {
+      setPage(previousPage => previousPage + 1);
+    }
+  };
+
+  const renderFooter = () => (
+    <View style={style.footerText}>
+      {loading && <ActivityIndicator />}
+      {isPaginationEnd && <Text>No more Products at the moment</Text>}
+    </View>
+  );
+
+  const renderEmpty = () => (
+    <View style={style.emptyText}>
+      <Text>No Data at the moment</Text>
+      <Button
+        onPress={() => dispatch(fetchProductsByPage(1))}
+        title="Refresh"
+      />
+    </View>
+  );
 
   return (
-    <SafeAreaView
-      style={{backgroundColor: 'red', display: 'flex', height: '100%'}}>
+    <SafeAreaView style={{display: 'flex', height: '100%'}}>
+      <TouchableOpacity onPress={() => console.log(page)}>
+        <Text>LOGA A TELA</Text>
+      </TouchableOpacity>
       <View
         style={{
-          backgroundColor: 'gray',
+          marginTop: 10,
+          marginBottom: 15,
           display: 'flex',
-          flexDirection: 'column',
+          paddingHorizontal: 10,
+          height: 25,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
         }}>
-        <View
-          style={{
-            backgroundColor: 'yellow',
-            display: 'flex',
-            paddingHorizontal: 10,
-            height: 25,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{}}>
-            <Text>{productsLength} itens</Text>
-          </View>
-          <View style={{}}>
-            <Text>Sort</Text>
-          </View>
+        <View style={{}}>
+          <Text>{productsLength} itens</Text>
         </View>
+        <View style={{}}>
+          <Text>{loading ? 'Carregando' : 'NÃO'}</Text>
+        </View>
+      </View>
+      {(isFirstLoad || products.length == 0) ? (
+        <View style={style.loading}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
         <FlatList
           data={products}
           renderItem={({item}) => (
             <ProductComponent key={item._id} productInfo={item} />
           )}
           numColumns={2}
+          ListFooterComponent={renderFooter}
+          onEndReached={fetchMoreData}
+          ListEmptyComponent={renderEmpty}
+          onEndReachedThreshold={0.1}
         />
-      </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -124,3 +127,31 @@ const ProductComponent = ({productInfo}: {productInfo: Product}) => {
     </View>
   );
 };
+
+const style = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: '700',
+    marginVertical: 15,
+    marginHorizontal: 10,
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerText: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  emptyText: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

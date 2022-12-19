@@ -1,54 +1,51 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {getProductsAPI} from '../../../api/services';
+import {InitialStateType, Product} from '../../../types';
 
-type Product = {
-  _id: string;
-  category: {
-    _id: string;
-    name: string;
-    slug: string;
-  };
-  createdAt: Date;
-  createdBy: {
-    _id: string;
-    name: string;
-    role: string;
-  };
-  description: string;
-  image: string;
-  price: number;
-  slug: string;
-  title: string;
-  updatedAt: Date;
-};
-
-type MyType = {
-  products: [] | Product[];
-  loading: boolean;
-};
-
-const myObject: MyType = {
+const initialState = {
   products: [],
   loading: false,
-};
+  isPaginationEnd: false,
+  isFirstLoad: false,
+} as InitialStateType;
+
+export const fetchProductsByPage = createAsyncThunk(
+  'users/fetchByIdStatus',
+  async (pageNumber: number, thunkAPI) => {
+    const response = await getProductsAPI(pageNumber);
+    return response.data;
+  },
+);
 
 export const productSlice = createSlice({
   name: 'product',
-  initialState: myObject,
+  initialState: initialState,
   reducers: {
-    getProducts(state, action: PayloadAction<Product[]>) {
-      state.products = action.payload;
+    setFirstLoad(state, action: PayloadAction<boolean>) {
+      state.isFirstLoad = action.payload;
     },
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(fetchProductsByPage.fulfilled, (state, action) => {
+        state.products = (state.products as Product[]).concat(
+          action.payload.data,
+        );
+        console.log(action?.payload?.metadata?.nextPage)
+        state.isPaginationEnd = !action?.payload?.metadata?.nextPage;
+        state.loading = false;
+      })
+      .addCase(fetchProductsByPage.pending, (state, action) => {
+        state.loading = true;
+        state.isFirstLoad = false;
+      })
+      .addCase(fetchProductsByPage.rejected, (state, action) => {
+        state.loading = false;
+        state.isFirstLoad = false;
+        console.log('ERROR');
+      });
   },
 });
 
-
-// export const fetchUsers = createAsyncThunk('users/fetchAll', async () => {
-//   const response = await userAPI.fetchAll()
-//   // Normalize the data before passing it to our reducer
-//   const normalized = normalize(response.data, [userEntity])
-//   return normalized.entities
-// })
-
-
-export const {getProducts} = productSlice.actions;
+export const {setFirstLoad} = productSlice.actions;
 export default productSlice.reducer;
