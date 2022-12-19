@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
+import languageReducer from '../reducers/language/languageReducer';
 import productReducer from '../reducers/product/productReducer';
 
 export const store = configureStore({
   reducer: {
-    products: productReducer
+    products: productReducer,
+    language: languageReducer
   }
 });
 

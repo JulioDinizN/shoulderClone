@@ -9,7 +9,6 @@ import {
   StyleSheet,
   Button,
   ActivityIndicator,
-  TouchableOpacity,
 } from 'react-native';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks/hooks';
 import {formatCurrency} from '../../utils/index';
@@ -18,6 +17,8 @@ import {
   fetchProductsByPage,
   setFirstLoad,
 } from '../../redux/reducers/product/productReducer';
+import { translate } from '../../localization/services';
+import { LocalizedText } from '../../design-system/atom';
 
 export function HomeScreen() {
   const [page, setPage] = useState(1);
@@ -44,13 +45,13 @@ export function HomeScreen() {
   const renderFooter = () => (
     <View style={style.footerText}>
       {loading && <ActivityIndicator />}
-      {isPaginationEnd && <Text>No more Products at the moment</Text>}
+      {isPaginationEnd && <LocalizedText textKey="paginationEnd"></LocalizedText>}
     </View>
   );
 
   const renderEmpty = () => (
     <View style={style.emptyText}>
-      <Text>No Data at the moment</Text>
+      <Text>{translate("paginationEnd")}</Text>
       <Button
         onPress={() => dispatch(fetchProductsByPage(1))}
         title="Refresh"
@@ -60,9 +61,6 @@ export function HomeScreen() {
 
   return (
     <SafeAreaView style={{display: 'flex', height: '100%'}}>
-      <TouchableOpacity onPress={() => console.log(page)}>
-        <Text>LOGA A TELA</Text>
-      </TouchableOpacity>
       <View
         style={{
           marginTop: 10,
@@ -74,10 +72,7 @@ export function HomeScreen() {
           justifyContent: 'space-between',
         }}>
         <View style={{}}>
-          <Text>{productsLength} itens</Text>
-        </View>
-        <View style={{}}>
-          <Text>{loading ? 'Carregando' : 'NÃO'}</Text>
+          <Text>{productsLength} {translate("itemsDisplay")}</Text>
         </View>
       </View>
       {(isFirstLoad || products.length == 0) ? (

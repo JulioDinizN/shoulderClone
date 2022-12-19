@@ -23,7 +23,7 @@ export const productSlice = createSlice({
   reducers: {
     setFirstLoad(state, action: PayloadAction<boolean>) {
       state.isFirstLoad = action.payload;
-    },
+    }
   },
   extraReducers(builder) {
     builder
@@ -31,7 +31,6 @@ export const productSlice = createSlice({
         state.products = (state.products as Product[]).concat(
           action.payload.data,
         );
-        console.log(action?.payload?.metadata?.nextPage)
         state.isPaginationEnd = !action?.payload?.metadata?.nextPage;
         state.loading = false;
       })

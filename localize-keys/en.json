@@ -1,18 +1,12 @@
 {
     "translation": {
-        "appName": "Localize example",
-        "hello": "Hello world",
-        "change": "cliked {{ count }}x",
-        "languageSettings": "LANGUAGE SETTINGS",
-        "interpolationExample": "Someone switched the language {{count}}x",
-        "please": "LOL! Please decide your language for once",
+        "settingsTitle": "Settings",
+        "homeTitle": "Home",
+        "paginationEnd": "No more Products at the moment",
+        "itemsDisplay": "items",
         "languages": {
-            "en": "en",
-            "pt": "pt"
-        },
-        "profileScene": {
-            "title": "My Profile",
-            "name": "Sayuri Mizuguchi"
-        }
+			"en": "en",
+			"pt": "pt"
+		}
     }
 }
