@@ -1,5 +1,5 @@
 import {Text} from 'react-native';
-import {translate} from '../../../localization/services';
+import {translate} from '../../localization/services';
 
 /**
  * what could be a FUCKING AWESOME COMPONENT, must have:
