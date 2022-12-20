@@ -1,0 +1,12 @@
+{
+    "translation": {
+        "settingsTitle": "Configurações",
+        "homeTitle": "Início",
+        "paginationEnd": "Não existem mais produtos no momento",
+        "itemsDisplay": "itens",
+        "languages": {
+			"en": "en",
+			"pt": "pt"
+		}
+    }
+}
